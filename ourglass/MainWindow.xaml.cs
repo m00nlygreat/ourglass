@@ -21,7 +21,7 @@ namespace ourglass
     public partial class MainWindow : Window
     {
         readonly int[] presetTime = { 15, 20, 30, 45, 60, 90, 120, 150 }; // 시간 콤보박스에 사용하는, 상수 배열
-
+        const string TYPEHERE = "Task명을 입력하세요."; // Task 텍스트 박스에 기본적으로 입력할 내용
         public MainWindow()
         {
             InitializeComponent();
@@ -30,7 +30,24 @@ namespace ourglass
                 cmbTime.Items.Add(presetTime[i]);
             }
             cmbTime.SelectedIndex = 2;
-            
+            tbxTask.Text = TYPEHERE;
+        }
+
+        private void TbxTask_GotFocus(object sender, RoutedEventArgs e) // 포커스시 가이드 문구 지우기
+        {
+            if (tbxTask.Text == TYPEHERE)
+            {
+                tbxTask.Text = "";
+            }
+        }
+
+        private void TbxTask_LostFocus(object sender, RoutedEventArgs e) // 입력 않고 떠날 경우 가이드 문구를 다시 노출
+        {
+            if (tbxTask.Text =="")
+            {
+                tbxTask.Text = TYPEHERE;
+            }
         }
     }
+
 }

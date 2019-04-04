@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ourglass"
         mc:Ignorable="d"
-        Title="MainWindow" Height="186.364" Width="447.273">
+        Title="MainWindow" Height="261.364" Width="514.273">
     <Grid>
-        <ComboBox x:Name="cmbTime" HorizontalAlignment="Left" VerticalAlignment="Top" Width="52" Margin="205,108,0,0" IsEditable="True"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ComboBox x:Name="cmbTime" HorizontalAlignment="Left" VerticalAlignment="Top" Width="52" Margin="205,116,0,0" IsEditable="True" Height="22"/>
+        <TextBox x:Name="tbxTask" HorizontalAlignment="Left" Height="22" Margin="10,116,0,0" TextWrapping="Wrap" Text="Task 입력" VerticalAlignment="Top" Width="190" GotFocus="TbxTask_GotFocus" LostFocus="TbxTask_LostFocus"/>
+        <Button x:Name="btnStart" Content="Start" HorizontalAlignment="Left" Margin="262,116,0,0" VerticalAlignment="Top" Width="75" Height="22"/>
     </Grid>
 </Window>
