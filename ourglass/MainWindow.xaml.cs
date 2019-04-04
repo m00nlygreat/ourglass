@@ -20,9 +20,17 @@ namespace ourglass
     /// </summary>
     public partial class MainWindow : Window
     {
+        readonly int[] presetTime = { 15, 20, 30, 45, 60, 90, 120, 150 }; // 시간 콤보박스에 사용하는, 상수 배열
+
         public MainWindow()
         {
             InitializeComponent();
+            for (int i=0; i < presetTime.Length; i++) // 시간 콤보박스에 미리 설정된 시간 (분) 추가
+            {
+                cmbTime.Items.Add(presetTime[i]);
+            }
+            cmbTime.SelectedIndex = 2;
+            
         }
     }
 }

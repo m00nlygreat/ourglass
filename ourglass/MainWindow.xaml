@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ourglass"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="186.364" Width="447.273">
     <Grid>
-        
+        <ComboBox x:Name="cmbTime" HorizontalAlignment="Left" VerticalAlignment="Top" Width="52" Margin="205,108,0,0" IsEditable="True"/>
     </Grid>
 </Window>
