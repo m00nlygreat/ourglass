@@ -49,5 +49,9 @@ namespace ourglass
             }
         }
     }
+    public class SecToHHMMSS // int로 초를 넣으면 HH:MM:SS 형태의 스트링을 되돌려주는 함수를 여기에 만들꺼다.
+    {
+        
+    }
 
 }
