@@ -48,10 +48,13 @@ namespace ourglass
                 tbxTask.Text = TYPEHERE;
             }
         }
-    }
-    public class SecToHHMMSS // int로 초를 넣으면 HH:MM:SS 형태의 스트링을 되돌려주는 함수를 여기에 만들꺼다.
-    {
-        
-    }
+        public string SecToHHMMSS(int sec) // int로 초를 넣으면 HH:MM:SS 형태의 스트링을 되돌려주는 함수를 여기에 만들꺼다.
+        {
+            TimeSpan time = TimeSpan.FromSeconds(sec);
 
+            //here backslash is must to tell that colon is
+            //not the part of format, it just a character that we want in output
+            return time.ToString(@"hh\:mm\:ss");
+        }
+    }
 }
