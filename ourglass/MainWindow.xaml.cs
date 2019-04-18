@@ -23,6 +23,7 @@ namespace ourglass
     {
         readonly int[] presetTime = { 15, 20, 30, 45, 60, 90, 120, 150 }; // 시간 콤보박스에 사용하는, 상수 배열
         const string TYPEHERE = "Task명을 입력하세요."; // Task 텍스트 박스에 기본적으로 입력할 내용
+        const string VERSION = "ourglass v1.5";
         System.Windows.Threading.DispatcherTimer timeTimer = new System.Windows.Threading.DispatcherTimer(); // 새 타이머 생성
         TimerTask curTask = new TimerTask();
         
@@ -47,7 +48,7 @@ namespace ourglass
             timeTimer.Interval = new TimeSpan(0, 0, 1);
 
             TaskbarItemInfo = new TaskbarItemInfo();
-            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Paused;
+            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
             TaskbarItemInfo.ProgressValue = 1;
         }
 
@@ -66,7 +67,12 @@ namespace ourglass
             curTask.timerSet = MinToSec(cmbTime.Text);
             curTask.timerRemaining = MinToSec(cmbTime.Text);
             curTask.taskDone = curTask.timerRemaining / curTask.timerSet;
-            curTask.taskName = tbxTask.Text;
+            if (tbxTask.Text==TYPEHERE) // Task가 입력되지 않으면, Null을 입력.
+            {
+                curTask.taskName = "";
+            }
+            else { curTask.taskName = tbxTask.Text; }
+                
 
             timeTimer.Start();
 
@@ -81,6 +87,7 @@ namespace ourglass
                 timeTimer.Stop();
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Paused; 
                 TaskbarItemInfo.ProgressValue = 1;
+                winOurglass.Title = "타이머 종료!";
             }
             else // 아니면, 남은 시간을 1씩 줄여나가고, 프로그레스 바를 갱신한다.
             {
@@ -88,7 +95,14 @@ namespace ourglass
                 DisplayTime(curTask.timerRemaining);
                 curTask.taskDone = (double)curTask.timerRemaining / curTask.timerSet;
                 TaskbarItemInfo.ProgressValue = curTask.taskDone;
-                winOurglass.Title = SecToHHMMSS(curTask.timerRemaining);
+                if (string.IsNullOrEmpty(curTask.taskName))
+                {
+                    winOurglass.Title = SecToHHMMSS(curTask.timerRemaining);
+                }
+                else
+                {
+                    winOurglass.Title = curTask.taskName + " - " + SecToHHMMSS(curTask.timerRemaining);
+                }
             }
         }
 
@@ -104,18 +118,13 @@ namespace ourglass
         public string SecToHHMMSS(int sec) // int로 초를 넣으면 HH:MM:SS 형태의 스트링을 되돌려준다.
         {
             TimeSpan time = TimeSpan.FromSeconds(sec);
-            return time.ToString(@"hh\:mm\:ss");
+            //return time.ToString(@"hh\:mm\:ss");
+            return time.ToString(@"hh") + BlinkingColon() + time.ToString(@"mm") + BlinkingColon() + time.ToString(@"ss");
         }
 
-        public int MinToSec(string min) { return Convert.ToInt16(min) * 60; } // 텍스트로 쓰여진 분 값을 초 단위의 int 값으로 돌려준다.
+        public int MinToSec(string min) { try { return Convert.ToInt16(min) * 60; } catch { return 1800; } } // 텍스트로 쓰여진 분 값을 초 단위의 int 값으로 돌려준다.
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(curTask.taskDone.ToString("P1", System.Globalization.CultureInfo.InvariantCulture));
-
-        }
-
-
+        public string BlinkingColon() { if (curTask.timerRemaining % 2 == 1) { return "."; } else { return ":"; } }  // 초마다 깜빡이는 콜론을 만든다.
 
         // 아래는 UI 기믹이다.
         private void CmbTime_DropDownClosed(object sender, EventArgs e) { if (timeTimer.IsEnabled) { } else { DisplayTime(MinToSec(cmbTime.Text)); } }

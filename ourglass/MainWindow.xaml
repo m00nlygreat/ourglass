@@ -17,6 +17,5 @@
         <TextBox x:Name="tbxTask" HorizontalAlignment="Left" Height="22" Margin="10,116,0,0" TextWrapping="Wrap" Text="Task 입력" VerticalAlignment="Top" Width="190" GotFocus="TbxTask_GotFocus" LostFocus="TbxTask_LostFocus" KeyDown="EnterKeyPressOnInputFields" TabIndex="1"/>
         <Button x:Name="btnStart" Content="Start" HorizontalAlignment="Left" Margin="262,116,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="TimerStart"/>
         <Label x:Name="lblTimeDisplay" Content="00:00:00" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="78" Width="327" FontSize="48" HorizontalContentAlignment="Center"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="262,93,0,0" VerticalAlignment="Top" Width="76" Click="Button_Click_1"/>
     </Grid>
 </Window>

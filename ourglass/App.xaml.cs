@@ -18,15 +18,24 @@ namespace ourglass
         {
             MainWindow wnd = new MainWindow();
             wnd.Show();
-            if (e.Args.Length == 1)
+            try
             {
-                try
+                switch (e.Args.Length)
                 {
-                    wnd.cmbTime.Text = e.Args[0];
-                    wnd.btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    default:
+                        break;
+                    case 1:
+                        wnd.cmbTime.Text = e.Args[0];
+                        wnd.btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                        break;
+                    case 2:
+                        wnd.cmbTime.Text = e.Args[0];
+                        wnd.tbxTask.Text = e.Args[1];
+                        wnd.btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                        break;
                 }
-                catch { }
             }
+            catch { }
         }
     }
 }
