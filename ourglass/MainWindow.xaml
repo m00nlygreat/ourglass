@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ourglass"
         mc:Ignorable="d"
-        Title="ourglass v1.5" Height="187.364" Width="358.273">
+        Title="ourglass v1.5" Height="187.364" Width="358.273" GotFocus="WinOurglass_GotFocus">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

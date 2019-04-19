@@ -48,7 +48,7 @@ namespace ourglass
             timeTimer.Interval = new TimeSpan(0, 0, 1);
 
             TaskbarItemInfo = new TaskbarItemInfo();
-            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
             TaskbarItemInfo.ProgressValue = 1;
         }
 
@@ -85,7 +85,7 @@ namespace ourglass
             if (curTask.timerRemaining == 0) // 시간이 다 되면, 타이머를 종료하고, 프로그레스 바 색상을 노란색으로 변경
             {
                 timeTimer.Stop();
-                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Paused; 
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate; 
                 TaskbarItemInfo.ProgressValue = 1;
                 winOurglass.Title = "타이머 종료!";
             }
@@ -154,6 +154,12 @@ namespace ourglass
             }
         }
 
-
+        private void WinOurglass_GotFocus(object sender, RoutedEventArgs e) // 타이머 종료후 포커스시 태스크바 상태 원상복귀
+        {
+            //if (TaskbarItemInfo.ProgressState == TaskbarItemProgressState.Indeterminate)
+            //{
+            //    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
+            //}
+        }
     }
 }
