@@ -48,7 +48,6 @@ namespace ourglass
             timeTimer.Interval = new TimeSpan(0, 0, 1);
 
             TaskbarItemInfo = new TaskbarItemInfo();
-            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
             TaskbarItemInfo.ProgressValue = 1;
         }
 
@@ -153,13 +152,12 @@ namespace ourglass
                 btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             }
         }
-
-        private void WinOurglass_GotFocus(object sender, RoutedEventArgs e) // 타이머 종료후 포커스시 태스크바 상태 원상복귀
+        private void WinOurglass_Activated(object sender, EventArgs e) // 타이머가 진행 중이지 않을 경우, 창을 활성화 하면 프로그레스 바 상태를 원래대로
         {
-            //if (TaskbarItemInfo.ProgressState == TaskbarItemProgressState.Indeterminate)
-            //{
-            //    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
-            //}
+            if (timeTimer.IsEnabled == false)
+            {
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+            }
         }
     }
 }
