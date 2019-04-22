@@ -59,6 +59,7 @@ namespace ourglass
             public int timerRemaining;
             public double taskDone;
             public string taskName;
+            public bool taskBeingDone;
         }
 
         private void TimerStart(object sender, RoutedEventArgs e) // 타이머 시작
@@ -74,6 +75,7 @@ namespace ourglass
                 
 
             timeTimer.Start();
+            curTask.taskBeingDone = true;
 
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
             TaskbarItemInfo.ProgressValue = 1;
@@ -84,6 +86,7 @@ namespace ourglass
             if (curTask.timerRemaining == 0) // 시간이 다 되면, 타이머를 종료하고, 프로그레스 바 색상을 노란색으로 변경
             {
                 timeTimer.Stop();
+                curTask.taskBeingDone = false;
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate; 
                 TaskbarItemInfo.ProgressValue = 1;
                 winOurglass.Title = "타이머 종료!";
@@ -101,6 +104,23 @@ namespace ourglass
                 else
                 {
                     winOurglass.Title = curTask.taskName + " - " + SecToHHMMSS(curTask.timerRemaining);
+                }
+            }
+        }
+        private void LblTimeDisplay_MouseDoubleClick(object sender, MouseButtonEventArgs e) // 타이머 스톱기능이 숨겨져 있읍니다.
+        {
+            if (timeTimer.IsEnabled == true)
+            {
+                timeTimer.Stop();
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+            }
+            else
+            {
+                if (TaskbarItemInfo.ProgressState == TaskbarItemProgressState.Indeterminate)
+                {
+                    timeTimer.Start();
+                    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
+                    WindowState = WindowState.Minimized;
                 }
             }
         }
@@ -154,7 +174,7 @@ namespace ourglass
         }
         private void WinOurglass_Activated(object sender, EventArgs e) // 타이머가 진행 중이지 않을 경우, 창을 활성화 하면 프로그레스 바 상태를 원래대로
         {
-            if (timeTimer.IsEnabled == false)
+            if (curTask.taskBeingDone == false)
             {
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
             }
