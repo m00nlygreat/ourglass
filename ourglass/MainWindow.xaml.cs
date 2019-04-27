@@ -23,10 +23,11 @@ namespace ourglass
     {
         readonly int[] presetTime = { 15, 20, 30, 45, 60, 90, 120, 150 }; // 시간 콤보박스에 사용하는, 상수 배열
         const string TYPEHERE = "Task명을 입력하세요."; // Task 텍스트 박스에 기본적으로 입력할 내용
-        const string VERSION = "ourglass v1.5";
+        const string VERSION = "v1.6";
         System.Windows.Threading.DispatcherTimer timeTimer = new System.Windows.Threading.DispatcherTimer(); // 새 타이머 생성
         TimerTask curTask = new TimerTask();
-        
+        List<TimerTask> prevTasks = new List<TimerTask>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -34,6 +35,7 @@ namespace ourglass
             var desktopWorkingArea = System.Windows.SystemParameters.WorkArea; // 윈도우 위치 설정
             this.Left = desktopWorkingArea.Left;
             this.Top = desktopWorkingArea.Bottom - this.Height;
+            winOurglass.Title += VERSION;
 
             for (int i = 0; i < presetTime.Length; i++) // 시간 콤보박스에 미리 설정된 시간 (분) 추가
             {
@@ -51,45 +53,60 @@ namespace ourglass
             TaskbarItemInfo.ProgressValue = 1;
         }
 
-
-
-        private class TimerTask // 태스크 클래스
+        private class TimerTask : ICloneable// 태스크 클래스
         {
             public int timerSet;
             public int timerRemaining;
             public double taskDone;
             public string taskName;
             public bool taskBeingDone;
+            public object Clone()
+            {
+                TimerTask copiedTask = new TimerTask();
+                copiedTask.timerSet = this.timerSet;
+                copiedTask.timerRemaining = this.timerRemaining;
+                copiedTask.taskDone = this.taskDone;
+                copiedTask.taskName = this.taskName;
+                copiedTask.taskBeingDone = this.taskBeingDone;
+                return copiedTask;
+            }
         }
 
-        private void TimerStart(object sender, RoutedEventArgs e) // 타이머 시작
+        private void StartTimer() // 타이머 시작
         {
+            if (curTask.taskBeingDone == true) { StopTimer(); } // 기 실행중인 타이머가 있으면 일단 스톱
             curTask.timerSet = MinToSec(cmbTime.Text);
             curTask.timerRemaining = MinToSec(cmbTime.Text);
             curTask.taskDone = curTask.timerRemaining / curTask.timerSet;
-            if (tbxTask.Text==TYPEHERE) // Task가 입력되지 않으면, Null을 입력.
-            {
-                curTask.taskName = "";
-            }
-            else { curTask.taskName = tbxTask.Text; }
-                
+            if (tbxTask.Text == TYPEHERE) { curTask.taskName = ""; } else { curTask.taskName = tbxTask.Text; } // Task가 입력되지 않으면, Null을 입력.
 
             timeTimer.Start();
+            btnStart.Content = "Stop";
             curTask.taskBeingDone = true;
 
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
             TaskbarItemInfo.ProgressValue = 1;
             WindowState = WindowState.Minimized;
         }
+        private void StopTimer()
+        {
+            timeTimer.Stop();
+            prevTasks.Add(curTask.Clone() as TimerTask);
+            curTask.taskBeingDone = false;
+            curTask.timerSet = MinToSec(cmbTime.Text);
+            curTask.timerRemaining = MinToSec(cmbTime.Text);
+            curTask.taskDone = curTask.timerRemaining / curTask.timerSet;
+            if (tbxTask.Text == TYPEHERE) { curTask.taskName = ""; } else { curTask.taskName = tbxTask.Text; }
+            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+            TaskbarItemInfo.ProgressValue = 1;
+            winOurglass.Title = "타이머 종료!";
+            btnStart.Content = "Start";
+        }
         private void TimeTimer_Tick(object sender, EventArgs e)
         {
             if (curTask.timerRemaining == 0) // 시간이 다 되면, 타이머를 종료하고, 프로그레스 바 색상을 노란색으로 변경
             {
-                timeTimer.Stop();
-                curTask.taskBeingDone = false;
-                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate; 
-                TaskbarItemInfo.ProgressValue = 1;
-                winOurglass.Title = "타이머 종료!";
+                StopTimer();
             }
             else // 아니면, 남은 시간을 1씩 줄여나가고, 프로그레스 바를 갱신한다.
             {
@@ -106,7 +123,7 @@ namespace ourglass
                     winOurglass.Title = curTask.taskName + " - " + SecToHHMMSS(curTask.timerRemaining);
                 }
             }
-        }
+        } // 타이머 틱시 일어나는 일들
         private void LblTimeDisplay_MouseDoubleClick(object sender, MouseButtonEventArgs e) // 타이머 스톱기능이 숨겨져 있읍니다.
         {
             if (timeTimer.IsEnabled == true)
@@ -143,7 +160,37 @@ namespace ourglass
 
         public int MinToSec(string min) { try { return Convert.ToInt16(min) * 60; } catch { return 1800; } } // 텍스트로 쓰여진 분 값을 초 단위의 int 값으로 돌려준다.
 
-        public string BlinkingColon() { if (curTask.timerRemaining % 2 == 1) { return "."; } else { return ":"; } }  // 초마다 깜빡이는 콜론을 만든다.
+        public string BlinkingColon() { if (curTask.timerRemaining % 2 == 1) { return "."; } else { return ":"; } }  // 1초마다 깜빡이는 콜론을 만든다.
+
+        private void BtnTasks_Click(object sender, RoutedEventArgs e) // Task 보여주기 버튼
+        {
+            string message = "현재 Task:\n\n";
+            message += string.Format("{0}\t{1}", string.Format("{0:P1}", 1 - curTask.taskDone), (string.IsNullOrEmpty(curTask.taskName)) ? "이름없는 Task" : curTask.taskName);
+            if (prevTasks.Count() != 0)
+            {
+                message += "\n\n이전 Task:\n\n";
+                int i = 1;
+                foreach (TimerTask task in prevTasks)
+                {
+                    message += string.Format("{1}\t{0}\n", (string.IsNullOrEmpty(task.taskName)) ? "이름없는 Task " + i++.ToString() : task.taskName, string.Format("{0:P1}", 1 - task.taskDone));
+                }
+            }
+            MessageBox.Show(message);
+            //try {MessageBox.Show(prevTasks[0].taskName +" " + prevTasks[1].taskName); } catch { MessageBox.Show("끝난 Task 없음!"); }
+        }
+
+        private void btnStart_Clicked(object sender, RoutedEventArgs e) // 타이머 상태에 따라, 버튼 기능 달리함.
+        {
+            if (curTask.taskBeingDone == true)
+            {
+                StopTimer();
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+            }
+            else
+            {
+                StartTimer();
+            }
+        }
 
         // 아래는 UI 기믹이다.
         private void CmbTime_DropDownClosed(object sender, EventArgs e) { if (timeTimer.IsEnabled) { } else { DisplayTime(MinToSec(cmbTime.Text)); } }
@@ -169,8 +216,9 @@ namespace ourglass
             if (e.Key == Key.Return)
 
             {
-                btnStart.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                StartTimer();
             }
+            // 버튼을 누르는 것이 아님. 타이머를 시작함.
         }
         private void WinOurglass_Activated(object sender, EventArgs e) // 타이머가 진행 중이지 않을 경우, 창을 활성화 하면 프로그레스 바 상태를 원래대로
         {

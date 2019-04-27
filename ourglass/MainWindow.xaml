@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ourglass"
         mc:Ignorable="d"
-        Title="ourglass v1.5" Height="187.364" Width="358.273" Activated="WinOurglass_Activated">
+        Title="ourglass " Height="184.364" Width="358.273" Activated="WinOurglass_Activated" ResizeMode="CanMinimize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -15,7 +15,15 @@
         </Grid.RowDefinitions>
         <ComboBox x:Name="cmbTime" HorizontalAlignment="Left" VerticalAlignment="Top" Width="52" Margin="205,116,0,0" IsEditable="True" Height="22" IsTextSearchEnabled="False" LostFocus="CmbTime_LostFocus" DropDownClosed="CmbTime_DropDownClosed" KeyDown="EnterKeyPressOnInputFields" Cursor="" IsTabStop="False" TabIndex="2"/>
         <TextBox x:Name="tbxTask" HorizontalAlignment="Left" Height="22" Margin="10,116,0,0" TextWrapping="Wrap" Text="Task 입력" VerticalAlignment="Top" Width="190" GotFocus="TbxTask_GotFocus" LostFocus="TbxTask_LostFocus" KeyDown="EnterKeyPressOnInputFields" TabIndex="1"/>
-        <Button x:Name="btnStart" Content="Start" HorizontalAlignment="Left" Margin="262,116,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="TimerStart"/>
+        <Button x:Name="btnStart" Content="Start" HorizontalAlignment="Left" Margin="262,116,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="btnStart_Clicked"/>
         <Label x:Name="lblTimeDisplay" Content="00:00:00" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="78" Width="327" FontSize="48" HorizontalContentAlignment="Center" MouseDoubleClick="LblTimeDisplay_MouseDoubleClick"/>
+        <Button x:Name="btnTasks" Content="Tasks..." Height="23" Margin="10,89,0,0" VerticalAlignment="Top" Click="BtnTasks_Click" HorizontalAlignment="Left" Width="53" BorderThickness="1" FontWeight="Bold" Foreground="Blue">
+            <Button.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}"/>
+            </Button.BorderBrush>
+            <Button.Background>
+                <SolidColorBrush Color="White"/>
+            </Button.Background>
+        </Button>
     </Grid>
 </Window>
