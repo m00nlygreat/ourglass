@@ -26,7 +26,9 @@ namespace ourglass
         const string VERSION = "v1.6";
         System.Windows.Threading.DispatcherTimer timeTimer = new System.Windows.Threading.DispatcherTimer(); // 새 타이머 생성
         TimerTask curTask = new TimerTask();
-        List<TimerTask> prevTasks = new List<TimerTask>();
+        public static List<TimerTask> prevTasks = new List<TimerTask>();
+        
+        bool isTasksBeingShown = false;
 
         public MainWindow()
         {
@@ -53,7 +55,7 @@ namespace ourglass
             TaskbarItemInfo.ProgressValue = 1;
         }
 
-        private class TimerTask : ICloneable// 태스크 클래스
+        public class TimerTask// 태스크 클래스
         {
             public int timerSet;
             public int timerRemaining;
@@ -164,19 +166,35 @@ namespace ourglass
 
         private void BtnTasks_Click(object sender, RoutedEventArgs e) // Task 보여주기 버튼
         {
-            string message = "현재 Task:\n\n";
-            message += string.Format("{0}\t{1}", string.Format("{0:P1}", 1 - curTask.taskDone), (string.IsNullOrEmpty(curTask.taskName)) ? "이름없는 Task" : curTask.taskName);
-            if (prevTasks.Count() != 0)
+            if (isTasksBeingShown == false)
             {
-                message += "\n\n이전 Task:\n\n";
-                int i = 1;
-                foreach (TimerTask task in prevTasks)
-                {
-                    message += string.Format("{1}\t{0}\n", (string.IsNullOrEmpty(task.taskName)) ? "이름없는 Task " + i++.ToString() : task.taskName, string.Format("{0:P1}", 1 - task.taskDone));
-                }
+                frmTasks.Navigate(new Uri("/Tasks.xaml", UriKind.Relative));
+                isTasksBeingShown = true;
+            } else
+            {
+                
+                frmTasks.Content = null;
+                frmTasks.NavigationService.RemoveBackEntry();
+
+                isTasksBeingShown = false;
             }
-            MessageBox.Show(message);
+
+            #region 메세지 박스로 보여주는 기존안
+            /*            string message = "현재 Task:\n\n";
+                        message += string.Format("{0}\t{1}", string.Format("{0:P1}", 1 - curTask.taskDone), (string.IsNullOrEmpty(curTask.taskName)) ? "이름없는 Task" : curTask.taskName);
+                        if (prevTasks.Count() != 0)
+                        {
+                            message += "\n\n이전 Task:\n\n";
+                            int i = 1;
+                            foreach (TimerTask task in prevTasks)
+                            {
+                                message += string.Format("{1}\t{0}\n", (string.IsNullOrEmpty(task.taskName)) ? "이름없는 Task " + i++.ToString() : task.taskName, string.Format("{0:P1}", 1 - task.taskDone));
+                            }
+                        }
+                        MessageBox.Show(message);
+            */
             //try {MessageBox.Show(prevTasks[0].taskName +" " + prevTasks[1].taskName); } catch { MessageBox.Show("끝난 Task 없음!"); }
+            #endregion
         }
 
         private void btnStart_Clicked(object sender, RoutedEventArgs e) // 타이머 상태에 따라, 버튼 기능 달리함.
@@ -228,4 +246,5 @@ namespace ourglass
             }
         }
     }
+
 }
