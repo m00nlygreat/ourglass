@@ -10,13 +10,18 @@
 
     <StackPanel Margin="10">
         <TextBlock TextWrapping="Wrap" Text="Tasks"/>
-        <ItemsControl Name="taskList" DataContext="{Binding MainWindowsprevTasks}" ItemsSource="{Binding}">
-            <ItemsControl.ItemTemplate>
+        <ListBox ItemsSource="{Binding}">
+            <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding}"></CheckBox>
+                    <StackPanel>
+                        <TextBlock Text="{Binding taskDone}"/>
+                        
+                    </StackPanel>
                 </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
 
     </StackPanel>
 </Page>

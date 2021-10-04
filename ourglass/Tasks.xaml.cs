@@ -20,10 +20,13 @@ namespace ourglass
     /// </summary>
     public partial class Tasks : Page
     {
+
         public Tasks()
         {
             InitializeComponent();
+
             // taskList.DataContext = prevTasks;
         }
+
     }
 }

@@ -13,9 +13,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
 
 namespace ourglass
 {
+    
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
@@ -25,9 +27,28 @@ namespace ourglass
         const string TYPEHERE = "Task명을 입력하세요."; // Task 텍스트 박스에 기본적으로 입력할 내용
         const string VERSION = "v1.6";
         System.Windows.Threading.DispatcherTimer timeTimer = new System.Windows.Threading.DispatcherTimer(); // 새 타이머 생성
+
+        public class TimerTask // 태스크 클래스
+        {
+            public int timerSet;
+            public int timerRemaining;
+            public double taskDone;
+            public string taskName;
+            public bool taskBeingDone;
+            public object Clone()
+            {
+                TimerTask copiedTask = new TimerTask();
+                copiedTask.timerSet = this.timerSet;
+                copiedTask.timerRemaining = this.timerRemaining;
+                copiedTask.taskDone = this.taskDone;
+                copiedTask.taskName = this.taskName;
+                copiedTask.taskBeingDone = this.taskBeingDone;
+                return copiedTask;
+            }
+        }
+
         TimerTask curTask = new TimerTask();
-        public static List<TimerTask> prevTasks = new List<TimerTask>();
-        
+        public static ObservableCollection<TimerTask> prevTasks = new ObservableCollection<TimerTask>();
         bool isTasksBeingShown = false;
 
         public MainWindow()
@@ -53,26 +74,12 @@ namespace ourglass
 
             TaskbarItemInfo = new TaskbarItemInfo();
             TaskbarItemInfo.ProgressValue = 1;
-        }
+            frmTasks.DataContext = prevTasks;
 
-        public class TimerTask// 태스크 클래스
-        {
-            public int timerSet;
-            public int timerRemaining;
-            public double taskDone;
-            public string taskName;
-            public bool taskBeingDone;
-            public object Clone()
-            {
-                TimerTask copiedTask = new TimerTask();
-                copiedTask.timerSet = this.timerSet;
-                copiedTask.timerRemaining = this.timerRemaining;
-                copiedTask.taskDone = this.taskDone;
-                copiedTask.taskName = this.taskName;
-                copiedTask.taskBeingDone = this.taskBeingDone;
-                return copiedTask;
-            }
-        }
+
+    }
+
+
 
         private void StartTimer() // 타이머 시작
         {
@@ -93,11 +100,12 @@ namespace ourglass
         private void StopTimer()
         {
             timeTimer.Stop();
-            prevTasks.Add(curTask.Clone() as TimerTask);
+            
             curTask.taskBeingDone = false;
             curTask.timerSet = MinToSec(cmbTime.Text);
             curTask.timerRemaining = MinToSec(cmbTime.Text);
             curTask.taskDone = curTask.timerRemaining / curTask.timerSet;
+            prevTasks.Add(curTask.Clone() as TimerTask);
             if (tbxTask.Text == TYPEHERE) { curTask.taskName = ""; } else { curTask.taskName = tbxTask.Text; }
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
             TaskbarItemInfo.ProgressValue = 1;
@@ -168,31 +176,33 @@ namespace ourglass
         {
             if (isTasksBeingShown == false)
             {
+
                 frmTasks.Navigate(new Uri("/Tasks.xaml", UriKind.Relative));
                 isTasksBeingShown = true;
+                btnTasks.Background = new SolidColorBrush(Color.FromRgb(240, 240, 240)); ;
             } else
             {
                 
                 frmTasks.Content = null;
                 frmTasks.NavigationService.RemoveBackEntry();
-
+                btnTasks.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
                 isTasksBeingShown = false;
             }
 
             #region 메세지 박스로 보여주는 기존안
-            /*            string message = "현재 Task:\n\n";
-                        message += string.Format("{0}\t{1}", string.Format("{0:P1}", 1 - curTask.taskDone), (string.IsNullOrEmpty(curTask.taskName)) ? "이름없는 Task" : curTask.taskName);
-                        if (prevTasks.Count() != 0)
-                        {
-                            message += "\n\n이전 Task:\n\n";
-                            int i = 1;
-                            foreach (TimerTask task in prevTasks)
-                            {
-                                message += string.Format("{1}\t{0}\n", (string.IsNullOrEmpty(task.taskName)) ? "이름없는 Task " + i++.ToString() : task.taskName, string.Format("{0:P1}", 1 - task.taskDone));
-                            }
-                        }
-                        MessageBox.Show(message);
-            */
+            //string message = "현재 Task:\n\n";
+            //message += string.Format("{0}\t{1}", string.Format("{0:P1}", 1 - curTask.taskDone), (string.IsNullOrEmpty(curTask.taskName)) ? "이름없는 Task" : curTask.taskName);
+            //if (prevTasks.Count() != 0)
+            //{
+            //    message += "\n\n이전 Task:\n\n";
+            //    int i = 1;
+            //    foreach (TimerTask task in prevTasks)
+            //    {
+            //        message += string.Format("{1}\t{0}\n", (string.IsNullOrEmpty(task.taskName)) ? "이름없는 Task " + i++.ToString() : task.taskName, string.Format("{0:P1}", 1 - task.taskDone));
+            //    }
+            //}
+            //MessageBox.Show(message);
+
             //try {MessageBox.Show(prevTasks[0].taskName +" " + prevTasks[1].taskName); } catch { MessageBox.Show("끝난 Task 없음!"); }
             #endregion
         }
@@ -220,7 +230,6 @@ namespace ourglass
                 tbxTask.Text = "";
             }
         }
-
         private void TbxTask_LostFocus(object sender, RoutedEventArgs e) // 입력 않고 떠날 경우 가이드 문구를 다시 노출
         {
             if (tbxTask.Text == "")
@@ -228,7 +237,6 @@ namespace ourglass
                 tbxTask.Text = TYPEHERE;
             }
         }
-
         private void EnterKeyPressOnInputFields(object sender, KeyEventArgs e) // 인풋필드에서 엔터키 입력시, 타이머 스타트
         {
             if (e.Key == Key.Return)
@@ -245,6 +253,28 @@ namespace ourglass
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
             }
         }
+
+        #region Page 안으로 DataContext를 삽입해준다. 이것때문에 일주일동안 씨름 ㅋㅋㅋㅋ
+
+        private void frmTasks_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            UpdateFrameDataContext(sender,null);
+        }
+
+        private void frmTasks_LoadCompleted(object sender, NavigationEventArgs e)
+        {
+            UpdateFrameDataContext(sender, e);
+        }
+
+        private void UpdateFrameDataContext(object sender, NavigationEventArgs e)
+        {
+            var content = frmTasks.Content as FrameworkElement;
+            if (content == null)
+                return;
+            content.DataContext = frmTasks.DataContext;
+        }
+
+        #endregion
     }
 
 }

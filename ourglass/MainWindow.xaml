@@ -22,6 +22,6 @@
                 </Button.Background>
             </Button>
         </Canvas>
-        <Frame x:Name="frmTasks" NavigationUIVisibility="Hidden"/>
+        <Frame x:Name="frmTasks" NavigationUIVisibility="Hidden" LoadCompleted="frmTasks_LoadCompleted" DataContextChanged="frmTasks_DataContextChanged"  />
     </StackPanel>
 </Window>
